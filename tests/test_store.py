@@ -1,4 +1,3 @@
-import uuid
 from typing import Any, Dict, Sequence, cast
 
 import pytest
@@ -6,6 +5,10 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import BaseMessage, HumanMessage
 from langchain_core.runnables import RunnableConfig
 from langchain_openai import OpenAIEmbeddings
+from redis import Redis
+from ulid import ULID
+
+from langgraph.checkpoint.redis import RedisSaver
 from langgraph.graph import START, MessagesState, StateGraph
 from langgraph.store.base import (
     BaseStore,
@@ -19,9 +22,6 @@ from langgraph.store.base import (
     SearchItem,
     SearchOp,
 )
-from redis import Redis
-
-from langgraph.checkpoint.redis import RedisSaver
 from langgraph.store.redis import RedisStore
 from tests.conftest import VECTOR_TYPES
 from tests.embed_test_utils import CharacterEmbeddings
@@ -464,7 +464,7 @@ def test_store_with_memory_persistence(redis_url: str) -> None:
             # Store new memories if the user asks the model to remember
             if "remember" in last_message.content.lower():  # type:ignore[union-attr]
                 memory = "User name is Bob"
-                store.put(namespace, str(uuid.uuid4()), {"data": memory})
+                store.put(namespace, str(ULID()), {"data": memory})
 
             messages = [{"role": "system", "content": system_msg}]
             messages.extend([msg.model_dump() for msg in state["messages"]])

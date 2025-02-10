@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import asyncio
 import json
-import uuid
 import weakref
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from types import TracebackType
 from typing import Any, AsyncIterator, Iterable, Optional, Sequence, cast
+from ulid import ULID
 
 from langgraph.store.base import (
     BaseStore,
@@ -398,7 +398,7 @@ class AsyncRedisStore(
         # Generate IDs for PUT operations
         for _, op in put_ops:
             if op.value is not None:
-                generated_doc_id = uuid.uuid4().hex
+                generated_doc_id = str(ULID())
                 namespace = _namespace_to_text(op.namespace)
                 doc_ids[(namespace, op.key)] = generated_doc_id
 
