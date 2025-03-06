@@ -1,11 +1,21 @@
 import base64
+import logging
 from typing import Any, Union
 
 from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 
+logger = logging.getLogger(__name__)
+
 
 class JsonPlusRedisSerializer(JsonPlusSerializer):
     """Redis-optimized serializer that stores strings directly."""
+
+    SENTINEL_FIELDS = [
+        "thread_id",
+        "checkpoint_id",
+        "checkpoint_ns",
+        "parent_checkpoint_id",
+    ]
 
     def dumps_typed(self, obj: Any) -> tuple[str, str]:  # type: ignore[override]
         if isinstance(obj, (bytes, bytearray)):
